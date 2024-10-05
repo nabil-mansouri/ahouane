@@ -1,6 +1,6 @@
 # Description
 
-Software As A Service backend with low memory print written in dart. 
+Software As A Service backend with low memory print written in dart
 
 The backend has following services:
 - Authentication service
