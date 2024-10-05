@@ -1,0 +1,48 @@
+email:
+  host: localhost
+  secure: false
+  port: 1025
+http:
+  host: 0.0.0.0
+  port: 8084
+mongodb:
+  port: 27018
+  username: test
+  password: password
+  publicResources:
+    - test
+    - testpublic
+    - test_json
+    - test_json_1
+  protectedResources:
+    - testprotected
+auth:
+  verifyEmailSubject: verify.subject
+  verifyEmailTemplate: verifyEmail.html
+  resetPwdSubject: reset.subject
+  resetPwdTemplate: resetPwd.html
+  adminApiKey: nabil
+storage:
+  directory: test/storage/
+i18n:
+  baseDirectory: test/i18n
+  defaultLang: fr
+scopes:
+  defaultRoleIds:
+    - user
+  initRoles:
+    - id: user
+      name: role.name.user
+      scopes:
+        - DBService.
+        - DBService.fetch
+        - StorageService.
+  publicScopes:
+    - AuthService.
+    - StorageService.fetch
+    - DBService.fetchOne
+tenants:
+  client1:
+    vhost: client1.localhost
+  client2:
+    vhost: client2.localhost

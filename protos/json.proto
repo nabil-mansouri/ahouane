@@ -1,0 +1,21 @@
+syntax = "proto3";
+import "google/protobuf/any.proto";
+
+message JsonValue{
+    oneof json_oneof {
+        int64 intValue = 1;
+        double doubleValue = 2;
+        string stringValue = 3;
+        bool boolValue = 4; 
+        bool nullValue = 5;
+        JsonObjectValue object = 6;
+        JsonArrayValue array = 7;
+        google.protobuf.Any custom = 8;
+    }
+}
+message JsonObjectValue{
+    map<string, JsonValue> value = 1;
+}
+message JsonArrayValue{
+    repeated JsonValue value = 1;
+}

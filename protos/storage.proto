@@ -1,0 +1,66 @@
+syntax = "proto3";
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+import "core.proto";
+service StorageService {
+    rpc meta(StoragePath) returns (StorageMeta) {}
+    rpc fetch(StoragePath) returns (stream StorageFile) {}
+    rpc create(stream StorageCreatePayload) returns (StorageMeta) {}
+    rpc update(stream StorageCreatePayload) returns (StorageMeta) {}
+    rpc delete(StoragePath) returns (StorageEmpty) {}
+    rpc share(StorageSharePayload) returns (StorageEmpty) {}
+}
+
+message StorageSharePayload{
+    repeated StorageShareRow toAdd = 1;
+    repeated StorageShareRow toRemove = 2;
+    StoragePath path = 3;
+}
+message StorageShareRow{
+    oneof share_oneof {
+        string user = 1;
+        string role = 2;
+        bool public = 3;
+        bool authenticated = 4;
+    }
+    bool read = 5;
+    bool write = 6;
+    bool manage = 7;
+}
+message StorageEmpty{}
+message StoragePath{
+    string path = 1;
+    string bucketId = 2;
+}
+message StorageCreatePayload{
+    oneof create_oneof{
+        StorageMeta meta = 1;
+        StorageFile chunk = 2;
+    }
+    bool upsert = 3;
+}
+
+message StorageMeta{
+    string id = 5;
+    StoragePath path = 1;
+    int32 size = 2;
+    google.protobuf.Timestamp createdAt = 3;
+    google.protobuf.Timestamp updatedAt = 4;
+    string contentType = 6;
+    repeated StorageShareRow rights = 7;
+    repeated google.protobuf.Any custom = 20;
+}
+
+message StorageFile{
+    bytes buffer = 2;
+}
+
+message ServerStorageConfig{
+    string directory = 1;
+    bool allowDotFiles = 2;
+    repeated string allowExtentions = 3;
+    repeated string forbidExtentions = 4;
+    ChannelServiceConfig serviceConfig = 5;
+    string rightResource = 6;
+    int32 maxPathDepth = 7;
+}

@@ -1,0 +1,52 @@
+syntax = "proto3";
+import "core.proto";
+import "json.proto";
+
+message EmailConfig{
+    string host = 1;
+    int32 port = 2;
+    string login = 3;
+    string password = 4;
+    bool secure = 5;
+    string fromName = 6;
+    string fromAddress = 7;
+    ChannelServiceConfig serviceConfig = 8;
+    bool enableLog = 9;
+    string clientDomain = 10;
+}
+
+service EmailService {
+    rpc sendMail(EmailPayload) returns (EmailStatus) {}
+}
+
+message EmailStatus{
+    bool success = 1;
+    string details = 2;
+}
+
+message EmailPayload{
+    repeated EmailAddress to = 1;
+    repeated EmailAddress cc = 2;
+    repeated EmailAddress cci = 3;
+    EmailAddress from = 4;
+    string rawSubject = 5;
+    string rawText = 6;
+    string rawHtml = 7;
+    repeated EmailAttachment attachments = 8;
+    bool dynamic = 9;
+    JsonObjectValue variables = 10;
+    string i18Subject = 11;
+    string i18Text = 12;
+    string i18Html = 13;
+}
+
+message EmailAddress{
+    string name = 1;
+    string address = 2; 
+}
+
+message EmailAttachment{
+    string name = 1;
+    string contentType = 2; 
+    bytes data = 3; 
+}

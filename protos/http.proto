@@ -1,0 +1,79 @@
+syntax = "proto3";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "core.proto";
+
+
+message HttpClientConfig{
+    string baseUri = 1;
+    bool emulateMethods = 2;
+}
+message HttpServiceConfig{
+    int32 maxBodySize = 1;
+    ChannelServiceConfig serviceConfig = 4;
+}
+
+
+message HttpServerConfig {
+    int32 port = 1;
+    bool secure = 2;
+    string host = 3;
+    string certificatePath = 4;
+    string privateKeyPath = 5;
+    string privateKeyPassword = 6;
+    bool enableMetrics = 7;
+    bool enableLogs = 8;
+}
+
+
+message MHttpHeader{
+    repeated string values = 1;
+}
+message MHttpHeaders{
+    google.protobuf.Timestamp date = 1;
+    google.protobuf.Timestamp expires = 2;
+    google.protobuf.Timestamp ifModifiedSince = 3;
+    string host = 4;
+    int32 port = 5;
+    string contentType = 6;
+    int32 contentLength = 7;
+    bool persistentConnection = 8;
+    bool chunkedTransferEncoding = 9;
+    map<string,MHttpHeader> headers = 10;
+}
+
+message MCookie{
+    string name = 1;
+    string value = 2;
+    google.protobuf.Timestamp expires = 3;
+    int32 maxAge = 4;
+    string domain = 5;
+    string path = 6;
+    bool secure = 7;
+    bool httpOnly = 8;
+}
+
+message MHttpRequest {
+    int32 contentLength = 1;
+    string method = 2;
+    string uri = 3;
+    string requestedUri = 4;
+    MHttpHeaders headers = 5;
+    repeated MCookie cookies = 6;
+    bool persistentConnection = 7;
+    string protocolVersion = 8;
+    string remoteAddress = 9;
+    int32 remotePort = 10;
+    int32 localPort = 11;
+}
+
+message MHttpResponse {
+    int32 contentLength = 1;
+    int32 statusCode = 2;
+    string reasonPhrase = 3;
+    bool persistentConnection = 4;
+    google.protobuf.Duration deadline = 5;
+    bool bufferOutput = 6;
+    MHttpHeaders headers = 7;
+    repeated MCookie cookies = 8;
+}

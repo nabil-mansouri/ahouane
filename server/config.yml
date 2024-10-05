@@ -1,0 +1,21 @@
+mongodb:
+  host: localhost
+  db: main
+  username: test
+  password: password
+  port: 27017
+  forbiddenResources:
+    - users
+http:
+  host: localhost
+  port: 8084
+storage:
+  directory: 'storage'
+  forbidExtentions: 
+    - 'exe'
+    - 'php'
+auth:
+  ressource: users
+  sessionDurationMinutes: 60
+  defaultScope:
+    - AuthService.*

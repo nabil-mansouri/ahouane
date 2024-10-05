@@ -1,0 +1,42 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+import "microservice.proto";
+
+message ClientApplicationConfig{
+    string host = 1;
+    int32 port = 2;
+    bool secure = 3;
+    string adminApiKey = 4;
+}
+message ChannelInterceptorConfig {
+    int32 priority = 1;
+    repeated InterceptorType types= 2;
+}
+message ChannelServiceConfig {
+    int32 priority = 1;
+    bool sequential = 2;
+}
+
+message Metric{
+    google.protobuf.Timestamp when = 1;
+    map<string,float> values = 2;
+    repeated string dimensions = 3;
+}
+
+service MetricService {
+    rpc push(Metric) returns (MetricResponse) {}
+}
+
+message MetricResponse{}
+
+
+
+message MultiTenantConfig{
+    map<string, TenantConfig> all = 1;
+}
+
+message TenantConfig{
+    string id = 1;
+    string vhost = 2;
+    bool defaut = 3;
+}

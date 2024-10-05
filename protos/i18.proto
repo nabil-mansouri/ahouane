@@ -1,0 +1,34 @@
+syntax = "proto3";
+import "json.proto";
+import "core.proto";
+
+message I18Config{
+    string baseDirectory = 1;
+    string defaultLang = 2;
+    ChannelServiceConfig serviceConfig = 8;
+}
+
+service I18Service {
+    rpc getRawValue(I18Key) returns (I18Value) {}
+    rpc getRawTemplate(I18Key) returns (I18Value) {}
+    rpc getValue(I18Key) returns (I18Value) {}
+    rpc getTemplate(I18Key) returns (I18Value) {}
+    rpc getKeys(I18KeysPayload) returns (I18Values) {}
+}
+
+message I18KeysPayload{
+    string forceLang = 1;
+}
+message I18Values{
+    map<string,string> values = 1;
+    string lang = 2;
+}
+message I18Key{
+    string key = 1;
+    JsonObjectValue variables = 2;
+    string forceLang = 3;
+}
+message I18Value{
+    string value = 1;
+    string lang = 2;
+}

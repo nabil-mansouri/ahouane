@@ -1,0 +1,27 @@
+syntax = "proto3";
+import "validate.proto";
+
+message IntrospectionObjects{
+    map<string,IntrospectionObject> objects = 1;
+}
+
+message IntrospectionObject{
+    string qualifiedName = 1;
+    repeated IntrospectionField fields = 2;
+    string displayName = 3;
+}
+
+message IntrospectionField{
+    string fieldName = 1;
+    string fieldTypeName = 2;
+    int32 fieldTypeInt = 3;
+    bool isEnum = 4;
+    bool isMessage = 5;
+    bool isRepeated = 6;
+    bool isMap = 7;
+    repeated string enumValues = 8;
+    IntrospectionObject embedType = 10;
+    int32 tagNumber = 11;
+    int32 fieldKeyTypeInt = 12;
+    validate.FieldRules validationRules = 13;
+}

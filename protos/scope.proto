@@ -1,0 +1,56 @@
+syntax = "proto3";
+import "core.proto";
+import "auth.proto";
+
+message ServerScopeConfig{
+    repeated string defaultRoleIds = 1;
+    repeated Role initRoles = 2;
+    string roleResource = 4;
+    string userResource = 5;
+    string scopeResource = 6;
+    ChannelServiceConfig serviceConfig = 7;
+    string intercept = 8;
+    repeated string publicScopes = 9;
+}
+
+service ScopeService {
+    rpc createScope(Scope) returns (Scope) {}
+    rpc createRole(Role) returns (Role) {}
+    rpc getRoles(ScopesPayload) returns (RoleList) {}
+    rpc attachScope(AttachScopePayload) returns (ScopeEmpty) {}
+    rpc detachScope(AttachScopePayload) returns (ScopeEmpty) {}
+    rpc attachRole(AttachRolePayload) returns (ScopeEmpty) {}
+    rpc detachRole(AttachRolePayload) returns (ScopeEmpty) {}
+    rpc affectDefaultRoles(User) returns (RoleList) {}
+}
+message RoleList{
+    repeated Role roles = 1;
+}
+message Role{
+    string id = 1;
+    string name = 2;
+    repeated string scopes = 3;
+}
+
+message Scope {
+    string id = 1;
+    string name = 2;
+}
+
+message ScopesPayload{
+    string userId = 1;
+}
+
+message AttachScopePayload{
+    string roleId = 1;
+    string scopeId = 2;
+}
+
+message AttachRolePayload{
+    string userId = 1;
+    string roleId = 2;
+}
+
+message ScopeEmpty{
+
+}

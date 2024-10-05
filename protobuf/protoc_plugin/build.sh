@@ -1,0 +1,1 @@
+dart compile exe bin/protoc_plugin.dart -o bin/protoc-gen-dart

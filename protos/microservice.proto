@@ -1,0 +1,59 @@
+syntax = "proto3";
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+
+enum InterceptorType {
+    Empty = 0;
+    Before = 1;
+    After = 2;
+    Error = 3;
+}
+
+message MessageSession{
+    string id = 1;
+    string userId = 2;
+    string displayName = 3;
+    google.protobuf.Timestamp createdAt = 4;
+    google.protobuf.Timestamp updatedAt = 5;
+    google.protobuf.Timestamp expireAt = 6;
+    repeated google.protobuf.Any custom = 7;
+    bool dirty = 8;
+    string lang = 9;
+    repeated string scopes = 10;
+    repeated string roles = 11;
+}
+message MessageHeader{
+    oneof routeoneof{
+        string correlationId = 1;
+        string route = 2;
+    }
+    MessageSession session = 3;
+    string contentType = 4;
+    map<string, string> attributes = 5;
+    string authorization = 7;
+    repeated google.protobuf.Any custom = 10;
+}
+message MessageBody {
+    oneof oneof_body {
+        bytes buffer = 10;
+        google.protobuf.Any object = 11;
+    }
+}
+message MessageTrailer{
+    int32 groupLength = 2;
+}
+message MessageError{
+    string code = 1;
+    string description = 2;
+    google.protobuf.Any details = 3;
+}
+message MessagePart {
+    string groupId = 2;
+    int32 numInGroup = 3;
+    oneof oneof_part {
+        MessageHeader header = 10;
+        MessageBody body = 11;
+        MessageError error = 12;
+        MessageTrailer trailer = 13;
+    }
+}

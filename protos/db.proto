@@ -1,0 +1,234 @@
+syntax = "proto3";
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+import "json.proto";
+import "core.proto";
+
+message MongoDBConfig{
+    string host = 1;
+    int32 port = 2;
+    string db = 3;
+    ChannelServiceConfig serviceConfig = 4;
+    string username = 5;
+    string password = 6;
+    repeated string publicResources = 7;
+    repeated string protectedResources = 8;
+    repeated string privateResources = 9;
+    string collectionPrefix = 10;
+}
+
+service DBService {
+    rpc count(FetchPayload) returns (CountResult) {}
+    rpc fetch(FetchPayload) returns (stream JsonObjectValue) {}
+    rpc fetchOne(FetchPayload) returns (FetchOneResponse) {}
+    rpc create(stream CreatePayload) returns (stream CreateResult) {}
+    rpc patch(stream PatchPayload) returns (stream PatchResult) {}
+    rpc update(UpdatePayload) returns (UpdateResult) {}
+    rpc delete(DeletePayload) returns (DeleteResult) {}
+    rpc share(DBSharePayload) returns (CountResult) {}
+}
+
+message DBSharePayload{
+    repeated DBShareRow toAdd = 1;
+    repeated DBShareRow toRemove = 2;
+    Query query = 3;
+}
+
+message DBShareRow{
+    oneof share_oneof {
+        string user = 1;
+        string role = 2;
+        bool public = 3;
+        bool authenticated = 4;
+    }
+    bool read = 5;
+    bool write = 6;
+    bool manage = 7;
+}
+
+service DBAdminService {
+    rpc createIndex(CreateIndexPayload) returns (CreateIndexResult) {}
+}
+
+message CountResult{
+    int32 count = 1;
+}
+
+message FetchOneResponse{
+    JsonObjectValue object = 1;
+}
+message CreateIndexPayload{
+    string name = 1;
+    string resource = 2;
+    bool unique = 3;
+    repeated QuerySort fields = 4;
+    google.protobuf.Any others = 6;
+    int32 expireAfterSeconds = 7;
+}
+message CreateIndexResult{
+    int32 nbIndex = 1;
+}
+message FetchPayload{
+    Query query = 1;
+}
+message CreatePayload{
+    string resource = 1;
+    JsonObjectValue value = 2;
+    DBSharePayload share = 3;
+}
+message CreateResult{
+    string id = 1;
+}
+message PatchPayload{
+    bool upsert = 1;
+    Query query = 2;
+    repeated DBPatchOperation operation = 4;
+    bool multiple = 5;
+}
+message PatchResult{
+    int32 nbModified = 1;
+}
+message UpdatePayload{
+    Query query = 1;
+    JsonObjectValue value = 2;
+    bool upsert = 3;
+    DBSharePayload share = 4;
+    bool multiple = 5;
+}
+message UpdateResult{
+    int32 nbModified = 1;
+}
+message DeletePayload{
+    Query query = 1;
+    bool multiple = 2;
+}
+message DeleteResult{
+    int32 nbDeleted = 1;
+}
+
+message UnknownStringValue{
+    string representation = 1;
+}
+
+message DBValue{
+    oneof dbvalue_oneof {
+        string regexValue = 1;
+        string objectId = 2;
+        google.protobuf.Timestamp dateValue = 3; 
+        bytes bufferValue = 4; 
+        UnknownStringValue unknown = 5;
+    }
+}
+
+message DBLinkOperation{
+    repeated string foreignId = 3;
+    DBForeignField foreignField = 4;
+    bool link = 5;
+}
+
+message DBPatchListOperation{
+    bool add = 1;
+    repeated JsonObjectValue values = 2;
+    string fieldName = 3;
+}
+
+message DBPatchUpdateOperation{
+    map<string,JsonValue> data = 3;
+}
+
+message DBPatchOperation{
+    oneof pathope_oneof{
+        DBLinkOperation link = 1;
+        DBPatchListOperation listOpe = 2;
+        DBPatchUpdateOperation updateOp = 3;
+    }
+}
+
+message Query{
+    string resource = 1;
+    repeated QueryProjection projections = 2;
+    repeated QueryFilter filters = 3;
+    repeated QuerySort sorts = 4;
+    repeated QueryJoin joins = 5;
+    int32 skip = 6;
+    int32 limit = 7;
+}
+
+message QueryJoin{
+    string resource = 1;
+    repeated QueryJoinCompare comparators = 2;
+}
+
+message QueryJoinCompare{
+    string fieldName = 1;
+    string foreignResource = 2;
+    string foreignField = 3;
+    QueryFilterComparator comparator = 4;
+}
+message QueryProjection{
+    string fieldName = 1;
+    string alias = 2;
+}
+
+message QuerySort{
+    string fieldName = 1;
+    bool descending = 2;
+    DBForeignField foreignField = 3;
+}
+//Filters
+message QueryFilter{
+    oneof filter_oneof{
+        QueryFilterCompare compare = 1;
+        QueryFilterLogical  logical = 2;
+        google.protobuf.Any any = 3;
+        QueryFilterLink link = 4;
+        SubQueryFilterMatch subQuery = 5;
+    }
+}
+
+message SubQueryFilterMatch{
+    string fieldName = 1;
+    repeated QueryFilter filter = 2;//avoid stackoverflow
+}
+
+message QueryFilterLink{
+    DBForeignField foreignField = 1;
+    string foreignId = 2;
+    bool link = 3;
+}
+enum QueryFilterComparator{
+    eq = 0;
+    neq = 1;
+    lt = 2;
+    lte = 3;
+    gt = 4;
+    gte = 5;
+    in = 6;
+    nin = 7;
+    contains = 8;
+    startsWith = 9;
+    endsWith = 10;
+    exists = 11;
+}
+message QueryFilterCompare{
+    string fieldName = 1;
+    JsonValue value = 2;
+    QueryFilterComparator comparator = 3;
+    bool isid = 4;
+}
+message QueryFilterLogical{
+    enum Operator{
+        not = 0;
+        and = 1;
+        nand = 2;
+        or = 3;
+        nor = 4;
+    }
+    repeated QueryFilter groups = 1;
+    Operator operation = 2;
+}
+
+message DBForeignField{
+    string resource = 1;
+    string fieldName = 2;
+}

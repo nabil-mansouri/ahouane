@@ -1,0 +1,20 @@
+syntax = "proto2";
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.FieldOptions {
+    optional FieldValidator validation = 10000;
+}
+extend google.protobuf.MessageOptions { 
+    optional bool disabled = 10000;
+}
+ 
+extend google.protobuf.OneofOptions { 
+    optional bool expect = 10000;
+}
+
+message FieldValidator{
+    optional bool required = 1;
+}
+message Test{
+    option (disabled) = true;
+}

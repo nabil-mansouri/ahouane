@@ -1,0 +1,55 @@
+syntax = "proto2";
+import "google/protobuf/timestamp.proto";
+
+message LogMessage{
+    enum Level{
+        Verbose = 0;
+        Debug = 1;
+        Info = 2;
+        Warn = 3;
+        Error = 4;
+    }
+    required Level level = 1;
+    required google.protobuf.Timestamp when = 2;
+    optional string who = 3;
+    optional string where = 4;
+    optional string what = 5;
+    optional string description = 6;
+    optional string serviceid = 7;
+    optional string stacktrace = 8;
+    optional string error = 9;
+    optional string details = 10;
+}
+
+message AHLogMessage{
+    required LogMessage.Level level = 1;
+    required google.protobuf.Timestamp when = 2;
+    required string id = 3;
+    map<string, string> variables = 4;
+    optional string stacktrace = 5;
+    optional string error = 6;
+}
+
+message ConsoleLogWritterConfig {
+    optional bool isDefault = 1 [default = false];
+    optional LogMessage.Level minLevel = 2 [default = Debug];
+    optional int32 methodCount = 3 [default = 1];
+    optional int32 errorMethodCount = 4 [default = 8];
+    optional int32 lineLength = 5 [default = 120];
+    optional bool colors = 6 [default = true];
+    optional bool printEmojis = 7 [default = true];
+    optional bool printTime = 8 [default = true];
+    optional bool prettyError = 9 [default = true];
+    optional bool prettyWarn = 10 [default = true];
+}
+
+message AHLogFilter{
+    optional LogMessage.Level minLevel = 1 [default = Debug];
+    repeated string contains = 2;
+}
+
+service LogService {
+    rpc log(LogMessage) returns (LogResponse) {}
+}
+
+message LogResponse{}

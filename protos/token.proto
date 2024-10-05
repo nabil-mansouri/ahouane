@@ -1,0 +1,37 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+
+message TokenConfig{
+    string ressource = 1;
+    int32 tokenLength = 2;
+}
+
+service TokenService{
+    rpc create(CreateTokenPayload) returns (Token) {}
+    rpc validate(TokenPayload) returns (TokenValidation) {}
+    rpc validateAndRemove(TokenPayload) returns (TokenValidation) {}
+    rpc remove(TokenPayload) returns (TokenEmpty) {}
+}
+
+message TokenEmpty{}
+
+message Token{
+    string value = 1;
+    string tokenType = 2;
+    google.protobuf.Timestamp createdAt = 3;
+    google.protobuf.Timestamp expireAt = 4;
+}
+
+message TokenPayload{
+    string value = 1;
+    string tokenType = 2;
+}
+
+message CreateTokenPayload{
+    string tokenType = 2;
+    google.protobuf.Timestamp expireAt = 4;
+}
+
+message TokenValidation{
+    bool success = 1;
+}

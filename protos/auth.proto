@@ -1,0 +1,103 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+import "json.proto";
+import "core.proto";
+import "validate.proto";
+
+
+service AuthService {
+    rpc createUserByEmail(CreateUserByEmailPayload) returns (User) {}
+    rpc updateUser(User) returns (User) {}
+    rpc deleteUser(User) returns (AuthEmpty) {}
+    rpc currentUser(AuthEmpty) returns (User) {}
+    rpc loginInByEmail(LoginInByEmailPayload) returns (User) {}
+    rpc logout(AuthEmpty) returns (AuthEmpty) {}
+    rpc sendMailVerification(SendMailVerificationPayload) returns (AuthEmpty) {}
+    rpc sendResetPasswordByMail(SendResetPasswordPayload) returns (AuthEmpty) {}
+    rpc resetPasswordByMail(ResetPasswordPayload) returns (User) {}
+    rpc verifyMail(VerifyMailPayload) returns (AuthEmpty) {}
+}
+service AuthAdminService {
+    rpc listUsers(AuthEmpty) returns (stream User) {}
+    rpc createUser(User) returns (CreateUserResponse) {}
+    rpc updateUser(UpdateUserPayload) returns (User) {}
+    rpc deleteUser(User) returns (AuthEmpty) {}
+    rpc blockUser(User) returns (User) {}
+    rpc unblockUser(User) returns (User) {}
+}
+message VerifyMailPayload{
+    string email = 1;
+    string token = 2;
+}
+message ResetPasswordPayload{
+    string email = 1;
+    string token = 2;
+    string password = 3;
+}
+message SendResetPasswordPayload{
+    string email = 1;
+}
+message SendMailVerificationPayload{
+    string email = 1;
+}
+message AuthEmpty{}
+message CreateUserByEmailPayload {
+    string email = 1 [(validate.rules)={string: {email: true}, message:{required: true}}];
+    string password = 2 [(validate.rules)={message:{required: true}}];
+}
+message LoginInByEmailPayload {
+    string email = 1;
+    string password = 2;
+}
+message User{
+    string id = 1;
+    string email = 2;
+    string phone = 3;
+    string displayName = 4;
+    bool verifiedEmail = 5;
+    bool verifiedPhone = 6;
+    google.protobuf.Timestamp createdAt = 7;
+    google.protobuf.Timestamp updatedAt = 8;
+    UserDetails details = 9;
+    UserAddress address = 10;
+    JsonObjectValue custom = 11;
+    string password = 12;
+    bool blocked = 13;
+}
+
+message UserDetails{
+    string title = 4;
+    string firstName = 1;
+    string lastName = 2;
+    google.protobuf.Timestamp birthDate = 3;
+}
+message UserAddress{
+    int32 number = 1;
+    string street = 2;
+    string street2 = 3;
+    string informations = 4;
+    string city = 5;
+    string zip = 6;
+    string country = 7;
+}
+message ServerAuthConfig{
+    string userResource = 1;
+    int32 sessionDurationMinutes = 2;
+    int32 tokenDurationMinutes = 3;
+    ChannelServiceConfig serviceConfig = 4;
+    string verifyEmailSubject = 5;
+    string verifyEmailTemplate = 6;
+    string resetPwdSubject = 7;
+    string resetPwdTemplate = 8;
+    string adminApiKey = 9;
+}
+
+message UpdateUserPayload{
+    User user = 1;
+    string newPassword = 2;
+}
+message CreateUserResponse{
+    User user = 1;
+    repeated string roles = 2;
+    repeated string scopes = 3;
+}
